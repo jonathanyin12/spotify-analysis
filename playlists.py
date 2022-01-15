@@ -68,7 +68,6 @@ def compare_playlists(playlist_stats):
             maxes[i] *=1.2
 
     ranges = tuple(zip(mins, maxes)) 
-    print(ranges)
 
     radar = ComplexRadar(fig, tuple(track_feature_cols), ranges)
     playlists = []
