@@ -51,7 +51,7 @@ def get_tracks_data(ids):
 def get_liked_tracks():
     tracks_ids = get_liked_tracks_ids()
     tracks_data = get_tracks_data(tracks_ids)
-    df = convert_to_df(tracks_data, columns= track_meta_cols+track_feature_cols)
+    df = convert_to_df(tracks_data, columns=track_meta_cols+track_feature_cols)
     return df
 
 
@@ -85,5 +85,15 @@ def get_top_tracks_ids(time_frame='long_term', limit=50):
 def get_top_tracks(time_frame='long_term', limit=50):
     tracks_ids = get_top_tracks_ids(time_frame, limit)
     tracks_data = get_tracks_data(tracks_ids)
-    df = convert_to_df(tracks_data, columns= track_meta_cols+track_feature_cols)
+    df = convert_to_df(tracks_data, columns=track_meta_cols+track_feature_cols)
     return df
+
+def get_recently_played(limit=50, after=None, before=None):
+    recent = sp.current_user_recently_played(limit, after, before)['items']
+    track_ids = []
+    for song in tqdm(recent):
+        if song['track'] and song['track']['id']:
+            track_ids.append(song['track']['id'])
+    tracks_data = get_tracks_data(track_ids)
+    recent_df = convert_to_df(tracks_data, columns=track_meta_cols+track_feature_cols)
+    return recent_df
