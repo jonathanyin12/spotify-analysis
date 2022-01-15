@@ -30,6 +30,3 @@ def get_spotify_playlists():
     playlist_ids = [playlist['id'] for playlist in playlists]
     return playlist_ids
 
-
-spotify_df = get_spotify_songs()
-spotify_df
