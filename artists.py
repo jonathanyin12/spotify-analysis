@@ -1,4 +1,5 @@
-from utils import sp, convert_to_df
+from utils import convert_to_df
+from config import sp
 
 def get_artist_data(artist_id):
     artist = sp.artist(artist_id)

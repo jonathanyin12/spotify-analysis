@@ -1,8 +1,11 @@
 
 from tqdm import tqdm
 from tracks import get_tracks_data, track_meta_cols, track_feature_cols
-from utils import sp, convert_to_df
+from utils import convert_to_df, ComplexRadar
 import pandas as pd
+from config import sp
+import matplotlib.pyplot as plt
+import numpy as np
 
 user_playlists = sp.current_user_playlists()['items']
 user_playlist_ids = {playlist['name']: playlist['id'] for playlist in user_playlists}
@@ -46,3 +49,33 @@ def get_playlists_stats(playlists):
 
     df = convert_to_df(playlists_stats, columns=['name']+track_feature_cols)
     return df
+
+
+def compare_playlists(playlist_stats):
+    fig = plt.figure(figsize=(12, 12))
+    mins = np.array(pd.DataFrame.min(playlist_stats.iloc[:, 1:], axis=0))
+    maxes = np.array(pd.DataFrame.max(playlist_stats.iloc[:, 1:], axis=0))
+
+    for i in range(len(mins)):
+        if mins[i] < 0:
+            mins[i] *= 1.2
+        else:
+            mins[i] *= 0.833
+
+        if maxes[i] < 0:
+            maxes[i] *= 0.833
+        else:
+            maxes[i] *=1.2
+
+    ranges = tuple(zip(mins, maxes)) 
+    print(ranges)
+
+    radar = ComplexRadar(fig, tuple(track_feature_cols), ranges)
+    playlists = []
+    for playlist in np.array(playlist_stats):
+        playlist_ = radar.plot(playlist[1:], label = playlist[0])
+        radar.fill(playlist[1:], alpha=0.1)
+        playlists.append(playlist_[0])
+
+    radar.ax.legend(handles=playlists)
+    plt.show()

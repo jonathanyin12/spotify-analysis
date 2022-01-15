@@ -1,7 +1,8 @@
 
 from tqdm import tqdm
-from utils import sp, convert_to_df
-
+from utils import convert_to_df, ComplexRadar
+from config import sp
+import matplotlib.pyplot as plt
 
 track_meta_cols =  ['name', 'album', 'artist', 'spotify_url', 'popularity', 'duration', 'explicit']
 track_feature_cols = ['acousticness', 'danceability', 'energy', 
@@ -97,3 +98,17 @@ def get_recently_played(limit=50, after=None, before=None):
     tracks_data = get_tracks_data(track_ids)
     recent_df = convert_to_df(tracks_data, columns=track_meta_cols+track_feature_cols)
     return recent_df
+
+
+# def compare_tracks(track_ids):
+#     fig = plt.figure(figsize=(12, 12))
+#     radar = ComplexRadar(fig, tuple(track_feature_cols), ranges)
+#     tracks = []
+#     for track_id in track_ids:
+#         features = get_track_features(track_id)
+#         track = radar.plot(features, label = str(get_track_meta(track_id)[0]))
+#         radar.fill(features, alpha=0.1)
+#         tracks.append(track[0])
+
+#     radar.ax.legend(handles=tracks)
+#     plt.show()
