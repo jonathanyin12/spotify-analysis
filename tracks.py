@@ -2,7 +2,6 @@
 from tqdm import tqdm
 from utils import convert_to_df, ComplexRadar
 from config import sp
-import matplotlib.pyplot as plt
 
 track_meta_cols =  ['name', 'album', 'artist', 'spotify_url', 'popularity', 'duration', 'explicit']
 track_feature_cols = ['acousticness', 'danceability', 'energy', 
