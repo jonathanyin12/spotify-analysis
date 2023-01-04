@@ -89,18 +89,18 @@ def timeseries_ridgeplot(df, factor, y, dateCol = 'date', title = '', save_name 
     def label(x, color, label):
         ax = plt.gca()
         if labels:
-            ax.text(-0.05, .25, labels[label], fontweight="bold", color=color,
+            ax.text(-0.05, .2, labels[label], fontweight="bold", color=color,
                     ha="left", va="center", transform=ax.transAxes)
         else:
-            ax.text(-0.05, .25, label, fontweight="bold", color=color,
+            ax.text(-0.05, .2, label, fontweight="bold", color=color,
                 ha="left", va="center", transform=ax.transAxes)
 
     ax = plt.gca()
     ax.set_xticklabels(ax.get_xticks(), fontweight='bold', color=pal[num_factors-1])
     ax.axes.xaxis.set_major_locator(MonthLocator(interval=1)) 
     ax.xaxis.set_major_formatter(DateFormatter('%b'))
-
     g.map(label,factor)
+
     g.set_titles("")
     g.figure.suptitle(title, fontweight='bold', color=pal[0], fontsize=18)
     g.set(yticks=[], ylabel="", xlabel = "")
@@ -116,7 +116,9 @@ def streamgraph(dates, ys, labels, title =''):
     plt.figure(figsize=(30,12))
     ax = plt.gca()
     plt.title(title)
-    fig = plt.stackplot(dates, ys, colors= sns.color_palette("muted"), labels = labels, baseline="wiggle")
+    pal = sns.cubehelix_palette(len(ys), rot=-.25, light=.7, hue=1)
+
+    fig = plt.stackplot(dates, ys, colors= pal, edgecolor='w', labels = labels, baseline="wiggle")
     ax.axes.xaxis.set_major_locator(MonthLocator(interval=1)) 
     ax.xaxis.set_major_formatter(DateFormatter('%b'))
     plt.legend(loc='upper left')
