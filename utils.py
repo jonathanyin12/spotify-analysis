@@ -1,7 +1,8 @@
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
-# import seaborn as sns # improves plot aesthetics
+import seaborn as sns # improves plot aesthetics
+from matplotlib.dates import MonthLocator, DateFormatter
 
 def _invert(x, limits):
     """inverts a value x on a scale from
@@ -74,6 +75,55 @@ class ComplexRadar():
 
 
 
+
+def timeseries_ridgeplot(df, factor, y, dateCol = 'date', title = '', save_name = None, aspect=20, height=1, labels=None):
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+    num_factors = len(pd.unique(df[factor]))
+    pal = sns.cubehelix_palette(num_factors, rot=-.25, light=.7)
+    g = sns.FacetGrid(df, row=factor, hue=factor, aspect=aspect, height=height, palette=pal)
+
+    g.map(plt.fill_between, dateCol, y, alpha=0.9)
+    g.map(sns.lineplot, dateCol, y, alpha=1, linewidth=2, color="w")
+    g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
+
+    def label(x, color, label):
+        ax = plt.gca()
+        if labels:
+            ax.text(-0.05, .25, labels[label], fontweight="bold", color=color,
+                    ha="left", va="center", transform=ax.transAxes)
+        else:
+            ax.text(-0.05, .25, label, fontweight="bold", color=color,
+                ha="left", va="center", transform=ax.transAxes)
+
+    ax = plt.gca()
+    ax.set_xticklabels(ax.get_xticks(), fontweight='bold', color=pal[num_factors-1])
+    ax.axes.xaxis.set_major_locator(MonthLocator(interval=1)) 
+    ax.xaxis.set_major_formatter(DateFormatter('%b'))
+
+    g.map(label,factor)
+    g.set_titles("")
+    g.figure.suptitle(title, fontweight='bold', color=pal[0], fontsize=18)
+    g.set(yticks=[], ylabel="", xlabel = "")
+    g.figure.subplots_adjust(hspace=-0.7)
+    g.despine(bottom=True, left=True)
+    plt.show()
+    if save_name:
+        g.figure.savefig(save_name, dpi=600)
+    sns.reset_orig()
+
+
+def streamgraph(dates, ys, labels, title =''):
+    plt.figure(figsize=(30,12))
+    ax = plt.gca()
+    plt.title(title)
+    fig = plt.stackplot(dates, ys, colors= sns.color_palette("muted"), labels = labels, baseline="wiggle")
+    ax.axes.xaxis.set_major_locator(MonthLocator(interval=1)) 
+    ax.xaxis.set_major_formatter(DateFormatter('%b'))
+    plt.legend(loc='upper left')
+    plt.ylabel("Mins listened a day")
+    ax.get_yaxis().set_visible(False)
+    ax.invert_yaxis()
+    plt.show()
 
 
 

@@ -3,10 +3,12 @@ from tqdm import tqdm
 from utils import convert_to_df, ComplexRadar
 from config import sp
 
-track_meta_cols =  ['name', 'album', 'artist', 'spotify_url', 'popularity', 'duration', 'explicit']
-track_feature_cols = ['acousticness', 'danceability', 'energy', 
-                    'instrumentalness', 'loudness',
-                     'tempo', 'valence']
+track_meta_cols = ['name', 'album', 'artist',
+                   'spotify_url', 'popularity', 'duration', 'explicit']
+track_feature_cols = ['acousticness', 'danceability', 'energy',
+                      'instrumentalness', 'loudness',
+                      'tempo', 'valence']
+
 
 def get_track_meta(meta):
     name = meta['name']
@@ -16,9 +18,11 @@ def get_track_meta(meta):
     # album_cover = meta['album']['images'][0]['url']
     popularity = meta['popularity']
     duration = meta['duration_ms']
-    explicit = meta['explicit']    
-    track_meta = [name, album, artist, spotify_url, popularity, duration, explicit]
+    explicit = meta['explicit']
+    track_meta = [name, album, artist, spotify_url,
+                  popularity, duration, explicit]
     return track_meta
+
 
 def get_track_features(features):
     try:
@@ -26,6 +30,7 @@ def get_track_features(features):
     except:
         features = None
     return features
+
 
 def get_track_data(meta, features):
     track_meta = get_track_meta(meta)
@@ -35,7 +40,7 @@ def get_track_data(meta, features):
         return track_data
     else:
         return None
-    
+
 
 def get_tracks_data(ids):
     tracks_data = []
@@ -47,6 +52,7 @@ def get_tracks_data(ids):
             if track_data:
                 tracks_data.append(track_data)
     return tracks_data
+
 
 def get_liked_tracks():
     tracks_ids = get_liked_tracks_ids()
@@ -64,7 +70,7 @@ def get_liked_tracks_ids():
             break
         else:
             liked_tracks.extend(tracks)
-            offset+=50
+            offset += 50
 
     track_ids = []
     for song in tqdm(liked_tracks):
@@ -74,7 +80,8 @@ def get_liked_tracks_ids():
 
 
 def get_top_tracks_ids(time_frame='long_term', limit=50):
-    top_tracks = sp.current_user_top_tracks(limit=limit, offset=0, time_range=time_frame)
+    top_tracks = sp.current_user_top_tracks(
+        limit=limit, offset=0, time_range=time_frame)
     track_ids = []
     for track in tqdm(top_tracks['items']):
         if track['id']:
@@ -88,6 +95,7 @@ def get_top_tracks(time_frame='long_term', limit=50):
     df = convert_to_df(tracks_data, columns=track_meta_cols+track_feature_cols)
     return df
 
+
 def get_recently_played(limit=50, after=None, before=None):
     recent = sp.current_user_recently_played(limit, after, before)['items']
     track_ids = []
@@ -95,9 +103,27 @@ def get_recently_played(limit=50, after=None, before=None):
         if song['track'] and song['track']['id']:
             track_ids.append(song['track']['id'])
     tracks_data = get_tracks_data(track_ids)
-    recent_df = convert_to_df(tracks_data, columns=track_meta_cols+track_feature_cols)
+    recent_df = convert_to_df(
+        tracks_data, columns=track_meta_cols+track_feature_cols)
     return recent_df
 
+
+def get_song_album(trackName, artistName):
+
+    results = sp.search(f"artist:{artistName} track:{trackName}", type='track').get(
+        'tracks').get('items')
+    album = None
+    for result in results:
+        artist = result.get('artists')[0].get('name')
+        track = result.get('name')
+        if track == trackName and artist == artistName:
+            albumType = result.get('album').get('album_type')
+            if not album:
+                album = result.get('album').get('name')
+            elif albumType == 'album' and (len(result.get('album').get('name')) > len(album) or album == trackName):
+                album = result.get('album').get('name')
+
+    return album
 
 # def compare_tracks(track_ids):
 #     fig = plt.figure(figsize=(12, 12))
